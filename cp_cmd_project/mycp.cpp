@@ -23,8 +23,6 @@ int copyFile(char *src, char *dest);
 //check whether given name is directory
 bool isdir(char* filename);
 
-//reverse the string
-char* strrev(char* str);
 
 
 /*workflow of main():
@@ -160,4 +158,86 @@ int main(int argc, char **argv){
 		}
 	}
 	return 0;	
+}
+
+
+
+
+bool isdir(char *filename){
+	struct stat file_info;
+	
+	//write status information of file into stat object
+	if(!stat(filename, &file_info)){
+		
+		if(IS_DIR(file_info.st_mod)){
+			return true;
+		}
+	
+	}else{
+		printf("Directory error\n");
+		exit(1);
+	}
+
+	return false;
+}
+
+
+
+int copyFile(char *src, char *dest){
+
+	int in_fd;
+	int out_fd;
+	int num_char;
+
+	char buffer[BUFFER_SIZE];
+	
+	if(isdir(dest)){
+		//create a new file of same name in the
+		//destination directory
+
+		int count = 0;//count file name including '\0'
+
+		int len = strlen(src);
+
+		while(src[len-count] != '/'){//find last '/'
+			count++;
+		}
+
+		char new_file_name[count];
+	
+		strcpy(new_file_name, &src[len-count+1]);
+
+		strcat(dest, new_file_name);
+	}
+	
+
+	if((in_fd = open(src, O_RDONLY) == -1)){
+		return 1;
+	}
+	
+	if((out_fd = open(dest, O_WRONLY | O_CREATE, PERMISSION_BIT))
+		== -1)
+	{return 1;}
+	
+
+
+	while(num_char = read(in_fd, buffer, BUFFER_SIZE)){
+		
+		if(num_char < 0){
+			printf("fails to read file %s\n", src);
+			return 1;
+		}
+
+		if(write(out_fd, buffer, num_char) < 0){
+			printf("fails to write file %s\n", dest);
+			return 1;
+		}
+	}
+	
+
+	if(close(in_fd) == -1 || close(out_fd) == -1){
+		printf("fails to close files\n");
+		return 1;
+	}	
+	return 0;
 }
