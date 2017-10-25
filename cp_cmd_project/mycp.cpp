@@ -100,7 +100,7 @@ int main(int argc, char **argv){
 
 	if(opt_l){
 		
-		if(is_dir(src)){
+		if(isdir(src)){
 			printf("cannot create hard link on directory\n");
 			exit(1);
 		}
@@ -116,14 +116,14 @@ int main(int argc, char **argv){
 	
 
 	if(opt_s){
-		if(is_dir(src)){
+		if(isdir(src)){
 			
 			printf("cannot create soft link on directory\n");
 			exit(1);
 		
 		}
 
-		if(symlink(src, det) == 0){
+		if(symlink(src, dest) == 0){
 			return 0;
 		}else{
 			printf("faild to create symbolic link\n");
@@ -134,7 +134,7 @@ int main(int argc, char **argv){
 
 	if(!isdir(src)){
 		
-		if(copyFile(src, det) == 0){
+		if(copyFile(src, dest) == 0){
 			return 0;
 		}else{
 			printf("Fails to copy\n");
@@ -170,7 +170,7 @@ bool isdir(char *filename){
 	//write status information of file into stat object
 	if(!stat(filename, &file_info)){
 		
-		if(IS_DIR(file_info.st_mod)){
+		if(S_ISDIR(file_info.st_mode)){
 			return true;
 		}
 	
@@ -216,7 +216,7 @@ int copyFile(char *src, char *dest){
 		return 1;
 	}
 	
-	if((out_fd = open(dest, O_WRONLY | O_CREATE, PERMISSION_BIT))
+	if((out_fd = open(dest, O_WRONLY | O_CREAT, PERMISSION_BIT))
 		== -1)
 	{return 1;}
 	
