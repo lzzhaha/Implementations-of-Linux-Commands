@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -240,4 +241,58 @@ int copyFile(char *src, char *dest){
 		return 1;
 	}	
 	return 0;
+}
+
+
+
+int copyDirectory(char *src, char *dest){
+	
+	/*a pointer to directory stream which 
+	 contains the ordered sequenc of 
+	all directory entries in a directory
+	*/
+	DIR* ds = NULL;
+	struct dirent *de;
+	
+	if((ds = opendir(src)) == NULL){
+		return 1;
+	}
+	
+	else{
+		/*readdir() return the directory
+		  entry at the position specified by
+		ds, and position the stream pointer to
+		the next entry in the stream 
+		*/
+		errno = 0;
+		while(de == readdir(ds)){
+			
+			if(errno != 0){
+				return 1;
+			}
+
+		
+			if(!isdir(de->d_name)){
+				/*copty the non-directory
+				  entry to destination using
+				 copyFile()
+				*/
+				
+			
+			char temp_src[256];
+			char temp_dest[256];
+			
+			strcpy(temp_src, src);
+			strcpy(temp_dest, dest);
+			strcat(temp_src, de->d_name);
+			strcat(temp_dest, de->d_name);
+			copyFile(temp_src, temp_dest);
+
+			 
+			}
+		}
+
+		closedir(ds);
+		return 0;	
+	}
 }
