@@ -174,8 +174,10 @@ bool isdir(char *filename){
 			return true;
 		}
 	
+	}else if(errno == ENOENT){
+		return false;
 	}else{
-		printf("Directory error\n");
+		printf("fails to check destination\n");
 		exit(1);
 	}
 
@@ -200,12 +202,13 @@ int copyFile(char *src, char *dest){
 
 		int len = strlen(src);
 
-		while(src[len-count] != '/'){//find last '/'
+		while(len-count >=0 && src[len-count] != '/'){//find last '/'
 			count++;
 		}
 
 		char new_file_name[count];
 	
+		
 		strcpy(new_file_name, &src[len-count+1]);
 
 		strcat(dest, new_file_name);
@@ -222,8 +225,7 @@ int copyFile(char *src, char *dest){
 	
 
 
-	while(num_char = read(in_fd, buffer, BUFFER_SIZE)){
-		
+	while((num_char = read(in_fd, buffer, BUFFER_SIZE)) > 0){
 		if(num_char < 0){
 			printf("fails to read file %s\n", src);
 			return 1;
@@ -233,6 +235,7 @@ int copyFile(char *src, char *dest){
 			printf("fails to write file %s\n", dest);
 			return 1;
 		}
+		printf("num_char: %d\n", num_char);
 	}
 	
 
